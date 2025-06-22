@@ -17,174 +17,88 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Modal de Notificação -->
-    <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 id="notification-title" class="text-lg font-bold text-gray-900"></h3>
-            <p id="notification-message" class="mt-2 text-sm text-gray-600"></p>
-            <div class="mt-4 flex justify-end">
-                <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Ok</button>
-            </div>
-        </div>
-    </div>
+    <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden"><div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4"><h3 id="notification-title" class="text-lg font-bold"></h3><p id="notification-message" class="mt-2 text-sm"></p><div class="mt-4 flex justify-end"><button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Ok</button></div></div></div>
 
-    <!-- Cabeçalho -->
-    <header class="bg-white shadow-md">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-            <div class="flex items-center space-x-4">
-                <img src="https://drive.google.com/uc?export=view&id=1L4yc0VdhoY_esmIZRABRcy9KOe3kwy86" alt="Logo Facilita Assist" class="h-12 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/150x50/005A9C/FFFFFF?text=Facilita Assist';">
-                <h1 class="text-2xl font-bold text-gray-900 hidden sm:block">Portal do Cliente</h1>
-            </div>
-            <div id="user-info" class="hidden">
-                 <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Sair</button>
-            </div>
-        </div>
-    </header>
+    <header class="bg-white shadow-md"><div class="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20"><div class="flex items-center space-x-4"><img src="https://drive.google.com/uc?export=view&id=1L4yc0VdhoY_esmIZRABRcy9KOe3kwy86" alt="Logo Facilita Assist" class="h-12 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/150x50/005A9C/FFFFFF?text=Facilita Assist';"><h1 class="text-2xl font-bold text-gray-900 hidden sm:block">Portal do Cliente</h1></div><div id="user-info" class="hidden"><button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Sair</button></div></div></header>
 
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- Seção de Login/Cadastro -->
         <div id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
-            <div class="flex border-b mb-6">
-                <button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-blue-500">Login</button>
-                <button id="register-tab" class="flex-1 py-2 text-center font-semibold text-gray-500">Registrar</button>
-            </div>
-            <!-- Formulário de Login -->
+            <div id="auth-tabs" class="flex border-b mb-6"><button id="login-tab" class="flex-1 py-2 text-center font-semibold border-b-2 border-blue-500">Login</button><button id="register-tab" class="flex-1 py-2 text-center font-semibold text-gray-500">Registrar</button></div>
             <form id="login-form" class="space-y-4">
-                <div>
-                    <label for="login-email" class="block text-sm font-medium text-gray-700">Email:</label>
-                    <input type="email" id="login-email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div>
-                    <label for="login-password" class="block text-sm font-medium text-gray-700">Senha:</label>
-                    <input type="password" id="login-password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Entrar</button>
+                <h2 class="text-xl font-bold text-center">Acesse sua Conta</h2>
+                <div><label for="login-email" class="block text-sm font-medium">Email:</label><input type="email" id="login-email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                <div><label for="login-password" class="block text-sm font-medium">Senha:</label><input type="password" id="login-password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Entrar</button>
+                <button type="button" id="forgot-password-button" class="w-full text-center text-sm text-blue-600 hover:underline">Esqueceu a senha?</button>
             </form>
-            <!-- Formulário de Registro -->
             <form id="register-form" class="hidden space-y-4">
-                <div>
-                    <label for="register-name" class="block text-sm font-medium text-gray-700">Seu Nome Completo:</label>
-                    <input type="text" id="register-name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div>
-                    <label for="register-email" class="block text-sm font-medium text-gray-700">Seu Melhor Email:</label>
-                    <input type="email" id="register-email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <div>
-                    <label for="register-password" class="block text-sm font-medium text-gray-700">Crie uma Senha:</label>
-                    <input type="password" id="register-password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                </div>
-                <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">Criar Conta</button>
+                <h2 class="text-xl font-bold text-center">Crie sua Conta</h2>
+                <div><label for="register-name" class="block text-sm font-medium">Nome Completo:</label><input type="text" id="register-name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                <div><label for="register-email" class="block text-sm font-medium">Email:</label><input type="email" id="register-email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                <div><label for="register-password" class="block text-sm font-medium">Senha (mínimo 6 caracteres):</label><input type="password" id="register-password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm font-medium text-white bg-green-600 hover:bg-green-700">Criar Conta</button>
             </form>
         </div>
 
-        <!-- Conteúdo do Cliente Logado -->
-        <div id="app-content" class="hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Coluna Formulário -->
-                <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-full">
-                    <h2 class="text-xl font-bold mb-4 border-b pb-3">Abrir Novo Chamado</h2>
-                    <form id="chamado-form" class="space-y-4">
-                        <div>
-                            <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone (WhatsApp):</label>
-                            <input type="tel" id="telefone" name="telefone" required placeholder="Ex: 5541999998888" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="endereco" class="block text-sm font-medium text-gray-700">Endereço Completo:</label>
-                            <input type="text" id="endereco" name="endereco" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                        </div>
-                        <div>
-                            <label for="categoria" class="block text-sm font-medium text-gray-700">Categoria de Serviço:</label>
-                            <select id="categoria" name="categoria" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                                <option>Eletricista</option>
-                                <option>Encanador</option>
-                                <option>Montador de Móveis</option>
-                                <option>Pintor</option>
-                                <option>Outro</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="detalhes" class="block text-sm font-medium text-gray-700">Detalhe do Defeito:</label>
-                            <textarea id="detalhes" name="detalhes" rows="3" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
-                        </div>
-                        <button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 rounded-md shadow-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Enviar Chamado</button>
-                    </form>
-                </div>
-                <!-- Coluna Meus Chamados -->
-                <div class="lg:col-span-2">
-                    <h2 class="text-xl font-bold mb-4">Meus Chamados</h2>
-                    <div id="chamados-list" class="space-y-4">
-                        <div class="text-center py-10"><i class="fas fa-spinner fa-spin fa-3x text-gray-400"></i><p class="mt-4 text-gray-500">Carregando...</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div id="app-content" class="hidden"><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-full"><h2 class="text-xl font-bold mb-4 border-b pb-3">Abrir Novo Chamado</h2><form id="chamado-form" class="space-y-4"><div><label for="telefone" class="block text-sm font-medium">Telefone (WhatsApp):</label><input type="tel" id="telefone" name="telefone" required placeholder="Ex: 5541999998888" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="endereco" class="block text-sm font-medium">Endereço Completo:</label><input type="text" id="endereco" name="endereco" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="categoria" class="block text-sm font-medium">Categoria de Serviço:</label><select id="categoria" name="categoria" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"><option>Eletricista</option><option>Encanador</option><option>Montador de Móveis</option><option>Pintor</option><option>Outro</option></select></div><div><label for="detalhes" class="block text-sm font-medium">Detalhe do Defeito:</label><textarea id="detalhes" name="detalhes" rows="3" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea></div><button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 rounded-md shadow-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Enviar Chamado</button></form></div><div class="lg:col-span-2"><h2 class="text-xl font-bold mb-4">Meus Chamados</h2><div id="chamados-list" class="space-y-4"><div class="text-center py-10"><i class="fas fa-spinner fa-spin fa-3x text-gray-400"></i><p class="mt-4 text-gray-500">Carregando...</p></div></div></div></div></div>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBIICQmfAMc-yNdXcyb6o9x5B9Yf3JzPos",
-            authDomain: "facilita-assist-chamados.firebaseapp.com",
-            projectId: "facilita-assist-chamados",
-            storageBucket: "facilita-assist-chamados.appspot.com",
-            messagingSenderId: "123881192310",
-            appId: "1:123881192310:web:ed6dc6f7486ee1ccbbd857",
-            measurementId: "G-V4PMT5HCFK"
-        };
+        const firebaseConfig = {"apiKey":"AIzaSyBIICQmfAMc-yNdXcyb6o9x5B9Yf3JzPos","authDomain":"facilita-assist-chamados.firebaseapp.com","projectId":"facilita-assist-chamados","storageBucket":"facilita-assist-chamados.appspot.com","messagingSenderId":"123881192310","appId":"1:123881192310:web:ed6dc6f7486ee1ccbbd857","measurementId":"G-V4PMT5HCFK"};
         const appId = 'central-chamados-default';
 
-        // Inicialização
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Elementos da UI
-        const authSection = document.getElementById('auth-section');
-        const appContent = document.getElementById('app-content');
-        const userInfo = document.getElementById('user-info');
-        const loginTab = document.getElementById('login-tab');
-        const registerTab = document.getElementById('register-tab');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
+        const ui = {
+            authSection: document.getElementById('auth-section'),
+            appContent: document.getElementById('app-content'),
+            userInfo: document.getElementById('user-info'),
+            loginTab: document.getElementById('login-tab'),
+            registerTab: document.getElementById('register-tab'),
+            loginForm: document.getElementById('login-form'),
+            registerForm: document.getElementById('register-form'),
+            logoutButton: document.getElementById('logout-button'),
+            chamadoForm: document.getElementById('chamado-form'),
+            chamadosList: document.getElementById('chamados-list'),
+            forgotPasswordButton: document.getElementById('forgot-password-button'),
+        };
 
-        // Monitor de Autenticação
+        let unsubscribeChamados = null;
+
         onAuthStateChanged(auth, user => {
             if (user) {
-                authSection.classList.add('hidden');
-                appContent.classList.remove('hidden');
-                userInfo.classList.remove('hidden');
-                listenToMyChamados(user.uid);
+                ui.authSection.classList.add('hidden');
+                ui.appContent.classList.remove('hidden');
+                ui.userInfo.classList.remove('hidden');
+                if (unsubscribeChamados) unsubscribeChamados();
+                unsubscribeChamados = listenToMyChamados(user.uid);
             } else {
-                authSection.classList.remove('hidden');
-                appContent.classList.add('hidden');
-                userInfo.classList.add('hidden');
+                ui.authSection.classList.remove('hidden');
+                ui.appContent.classList.add('hidden');
+                ui.userInfo.classList.add('hidden');
+                if (unsubscribeChamados) unsubscribeChamados();
+                ui.chamadosList.innerHTML = '';
             }
         });
 
-        // Lógica de abas de Login/Registro
-        loginTab.addEventListener('click', () => {
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-            loginTab.classList.add('border-blue-500', 'text-gray-900');
-            registerTab.classList.remove('border-blue-500', 'text-gray-900');
-            registerTab.classList.add('text-gray-500');
-        });
-        registerTab.addEventListener('click', () => {
-            registerForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
-            registerTab.classList.add('border-blue-500', 'text-gray-900');
-            loginTab.classList.remove('border-blue-500', 'text-gray-900');
-            loginTab.classList.add('text-gray-500');
-        });
+        ui.loginTab.addEventListener('click', () => toggleTabs(true));
+        ui.registerTab.addEventListener('click', () => toggleTabs(false));
 
-        // Lógica de Registro
-        registerForm.addEventListener('submit', async e => {
+        function toggleTabs(isLogin) {
+            ui.loginForm.classList.toggle('hidden', !isLogin);
+            ui.registerForm.classList.toggle('hidden', isLogin);
+            ui.loginTab.classList.toggle('border-blue-500', isLogin);
+            ui.registerTab.classList.toggle('border-blue-500', !isLogin);
+        }
+
+        ui.registerForm.addEventListener('submit', async e => {
             e.preventDefault();
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
@@ -192,40 +106,43 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: name });
-                showModal("Sucesso!", "Sua conta foi criada. Você já está logado.");
-                registerForm.reset();
+                ui.registerForm.reset();
             } catch (error) {
                 showModal("Erro no Registro", getFirebaseErrorMessage(error));
             }
         });
 
-        // Lógica de Login
-        loginForm.addEventListener('submit', async e => {
+        ui.loginForm.addEventListener('submit', async e => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                loginForm.reset();
+                ui.loginForm.reset();
             } catch (error) {
                 showModal("Erro no Login", getFirebaseErrorMessage(error));
             }
         });
-
-        // Lógica de Logout
-        document.getElementById('logout-button').addEventListener('click', () => {
-            signOut(auth);
+        
+        ui.forgotPasswordButton.addEventListener('click', () => {
+            const email = prompt("Por favor, insira seu e-mail para enviarmos o link de redefinição de senha:");
+            if (email) {
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        showModal("E-mail Enviado", "Verifique sua caixa de entrada (e spam) para o link de redefinição de senha.");
+                    })
+                    .catch(error => {
+                        showModal("Erro", getFirebaseErrorMessage(error));
+                    });
+            }
         });
 
-        // Lógica de Abrir Chamado
-        const chamadoForm = document.getElementById('chamado-form');
-        chamadoForm.addEventListener('submit', async e => {
+        ui.logoutButton.addEventListener('click', () => signOut(auth));
+
+        ui.chamadoForm.addEventListener('submit', async e => {
             e.preventDefault();
             const user = auth.currentUser;
-            if (!user) {
-                showModal("Erro", "Você precisa estar logado para abrir um chamado.");
-                return;
-            }
+            if (!user) return;
 
             const chamadoData = {
                 userId: user.uid,
@@ -243,68 +160,38 @@
             try {
                 const chamadosCollection = collection(db, 'artifacts', appId, 'public', 'data', 'chamados');
                 await addDoc(chamadosCollection, chamadoData);
-                showModal("Sucesso!", "Seu chamado foi aberto. Acompanhe o status aqui no portal.");
-                chamadoForm.reset();
-            } catch (error) {
-                showModal("Erro", "Não foi possível enviar seu chamado. Tente novamente.");
-            }
+                showModal("Sucesso!", "Seu chamado foi aberto e pode ser acompanhado aqui no portal.");
+                ui.chamadoForm.reset();
+            } catch (error) { showModal("Erro", "Não foi possível enviar seu chamado."); }
         });
 
-        // Ouvir e mostrar os chamados do cliente
         function listenToMyChamados(userId) {
             const chamadosCollection = collection(db, 'artifacts', appId, 'public', 'data', 'chamados');
             const q = query(chamadosCollection, where("userId", "==", userId));
-
-            onSnapshot(q, (snapshot) => {
+            return onSnapshot(q, snapshot => {
                 const chamados = [];
-                snapshot.forEach(doc => {
-                    chamados.push({ id: doc.id, ...doc.data() });
-                });
-                chamados.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
-                renderChamados(chamados);
-            }, (error) => {
-                console.error("Erro ao carregar chamados: ", error);
-                const list = document.getElementById('chamados-list');
-                list.innerHTML = `<div class="text-center py-10 bg-white rounded-lg shadow"><i class="fas fa-exclamation-triangle fa-3x text-red-400"></i><p class="mt-4 text-gray-600">Erro ao carregar seus chamados. Verifique as regras de segurança no Firestore.</p></div>`;
+                snapshot.forEach(doc => chamados.push({ id: doc.id, ...doc.data() }));
+                renderChamados(chamados.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0)));
             });
         }
 
-        // Renderizar os cards de chamado
         function renderChamados(chamados) {
-            const list = document.getElementById('chamados-list');
             if (chamados.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 bg-white rounded-lg shadow"><i class="fas fa-inbox fa-3x text-gray-400"></i><p class="mt-4 text-gray-600">Você ainda não abriu nenhum chamado.</p></div>`;
+                ui.chamadosList.innerHTML = `<div class="text-center py-10 bg-white rounded-lg shadow"><i class="fas fa-inbox fa-3x text-gray-400"></i><p class="mt-4 text-gray-600">Você ainda não abriu nenhum chamado.</p></div>`;
                 return;
             }
-            list.innerHTML = chamados.map(c => {
-                const dataAbertura = c.timestamp ? c.timestamp.toDate().toLocaleDateString('pt-BR') : 'Data indisponível';
+            ui.chamadosList.innerHTML = chamados.map(c => {
+                const dataAbertura = c.timestamp ? c.timestamp.toDate().toLocaleDateString('pt-BR') : '';
                 const statusClass = `status-${c.status.toLowerCase().replace(/\s+/g, '-')}`;
-                let statusText = c.status;
-                if(c.os) {
-                    statusText = `OS: ${c.os} - ${c.status}`;
-                }
-
-                return `
-                <div class="bg-white rounded-lg shadow-md p-5 ${statusClass}">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="font-bold text-lg">${c.categoria}</p>
-                            <p class="text-sm text-gray-500">Aberto em: ${dataAbertura}</p>
-                        </div>
-                        <span class="text-xs text-center font-semibold text-white px-3 py-1 rounded-full ${c.status === 'Chamado Recebido' ? 'bg-blue-500' : c.status === 'Aceito' ? 'bg-green-500' : c.status === 'Finalizado' ? 'bg-gray-500' : 'bg-red-500'}">${statusText}</span>
-                    </div>
-                    <div class="mt-4 pt-4 border-t">
-                        <p class="text-sm"><strong class="text-gray-600">Detalhes:</strong> ${c.detalhes}</p>
-                    </div>
-                </div>
-            `}).join('');
+                const statusText = c.os ? `OS: ${c.os} - ${c.status}` : c.status;
+                return `<div class="bg-white rounded-lg shadow-md p-5 ${statusClass}"><div class="flex justify-between items-start"><div><p class="font-bold text-lg">${c.categoria}</p><p class="text-sm text-gray-500">Aberto em: ${dataAbertura}</p></div><span class="text-xs text-center font-semibold text-white px-3 py-1 rounded-full ${c.status === 'Chamado Recebido'?'bg-blue-500':c.status === 'Aceito'?'bg-green-500':c.status === 'Finalizado'?'bg-gray-500':'bg-red-500'}">${statusText}</span></div><div class="mt-4 pt-4 border-t"><p class="text-sm"><strong class="text-gray-600">Detalhes:</strong> ${c.detalhes}</p></div></div>`;
+            }).join('');
         }
         
-        // Funções do Modal e Erros
         function getFirebaseErrorMessage(error) {
             switch (error.code) {
                 case 'auth/invalid-email': return 'O formato do e-mail é inválido.';
-                case 'auth/user-not-found': return 'Não há conta com este e-mail.';
+                case 'auth/user-not-found': return 'Não há conta registrada com este e-mail.';
                 case 'auth/wrong-password': return 'Senha incorreta.';
                 case 'auth/email-already-in-use': return 'Este e-mail já foi cadastrado.';
                 case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.';
@@ -312,14 +199,8 @@
             }
         }
         
-        window.showModal = function(title, message) {
-            document.getElementById('notification-title').textContent = title;
-            document.getElementById('notification-message').textContent = message;
-            document.getElementById('notification-modal').classList.remove('hidden');
-        }
-        window.closeModal = function() {
-            document.getElementById('notification-modal').classList.add('hidden');
-        }
+        window.showModal = (title, message) => { document.getElementById('notification-title').textContent = title; document.getElementById('notification-message').textContent = message; document.getElementById('notification-modal').classList.remove('hidden'); }
+        window.closeModal = () => { document.getElementById('notification-modal').classList.add('hidden'); }
     </script>
 </body>
 </html>
