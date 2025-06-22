@@ -62,7 +62,6 @@
         const ui = { authSection: document.getElementById('auth-section'), appContent: document.getElementById('app-content'), userInfo: document.getElementById('user-info'), loginTab: document.getElementById('login-tab'), registerTab: document.getElementById('register-tab'), loginForm: document.getElementById('login-form'), registerForm: document.getElementById('register-form'), logoutButton: document.getElementById('logout-button'), chamadoForm: document.getElementById('chamado-form'), chamadosList: document.getElementById('chamados-list'), forgotPasswordButton: document.getElementById('forgot-password-button'), userNameSpan: document.getElementById('user-name'), };
 
         let unsubscribeChamados = null;
-        let currentUserData = null;
 
         onAuthStateChanged(auth, async user => {
             if (user) {
@@ -80,7 +79,6 @@
                 ui.userInfo.classList.add('hidden');
                 if (unsubscribeChamados) unsubscribeChamados();
                 ui.chamadosList.innerHTML = '';
-                currentUserData = null;
             }
         });
 
@@ -88,10 +86,9 @@
             const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
             const userSnap = await getDoc(userRef);
             if(userSnap.exists()) {
-                currentUserData = userSnap.data();
-                // Preenche o formulário com os dados salvos
-                document.getElementById('telefone').value = currentUserData.telefone || '';
-                document.getElementById('endereco').value = currentUserData.endereco || '';
+                const userData = userSnap.data();
+                document.getElementById('telefone').value = userData.telefone || '';
+                document.getElementById('endereco').value = userData.endereco || '';
             }
         }
 
@@ -115,7 +112,6 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: name });
-                // Salva dados adicionais no Firestore
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userCredential.user.uid);
                 await setDoc(userRef, { nome: name, email: email, telefone: phone, endereco: address });
                 ui.registerForm.reset();
@@ -157,21 +153,25 @@
             ui.chamadosList.innerHTML = chamados.map(c => {
                 const dataAbertura = c.timestamp ? c.timestamp.toDate().toLocaleDateString('pt-BR') : '';
                 const statusClass = `status-${c.status.toLowerCase().replace(/\s+/g, '-')}`;
-                const statusText = c.os ? `OS: ${c.os} - ${c.status}` : c.status;
-                const trackButton = c.status === 'Técnico a caminho' && c.tecnicoLocation ? `<a href="https://www.google.com/maps/search/?api=1&query=${c.tecnicoLocation.latitude},${c.tecnicoLocation.longitude}" target="_blank" class="mt-2 inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-1 px-3 rounded-lg text-sm">Acompanhar Técnico</a>` : '';
-                return `<div class="bg-white rounded-lg shadow-md p-5 ${statusClass}"><div class="flex justify-between items-start"><div><p class="font-bold text-lg">${c.categoria}</p><p class="text-sm text-gray-500">Aberto em: ${dataAbertura}</p></div><span class="text-xs text-center font-semibold text-white px-3 py-1 rounded-full ${c.status === 'Chamado Recebido'?'bg-blue-500':c.status === 'Aceito'?'bg-green-500':c.status === 'Técnico a caminho'?'bg-orange-500':c.status === 'Finalizado'?'bg-gray-500':'bg-red-500'}">${statusText}</span></div><div class="mt-4 pt-4 border-t"><p class="text-sm"><strong class="text-gray-600">Detalhes:</strong> ${c.detalhes}</p>${trackButton}</div></div>`;
+
+                let statusText = c.os ? `OS: ${c.os} - ${c.status}` : c.status;
+                if (c.status === 'Finalizado' && c.dataFinalizacao) {
+                    statusText = `Finalizado em: ${c.dataFinalizacao.toDate().toLocaleDateString('pt-BR')}`;
+                }
+
+                let infoExtra = `<p class="text-sm"><strong class="text-gray-600">Detalhes:</strong> ${c.detalhes}</p>`;
+                if (c.status === 'Técnico a caminho') {
+                    const nomeTecnico = c.nomeTecnico ? `<p class="text-sm mt-2"><strong class="text-gray-600">Técnico:</strong> ${c.nomeTecnico}</p>` : '';
+                    const trackButton = c.tecnicoLocation ? `<a href="https://www.google.com/maps/search/?api=1&query=${c.tecnicoLocation.latitude},${c.tecnicoLocation.longitude}" target="_blank" class="mt-2 inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-1 px-3 rounded-lg text-xs">Acompanhar Técnico</a>` : '';
+                    infoExtra += nomeTecnico + trackButton;
+                }
+
+                return `<div class="bg-white rounded-lg shadow-md p-5 ${statusClass}"><div class="flex justify-between items-start"><div><p class="font-bold text-lg">${c.categoria}</p><p class="text-sm text-gray-500">Aberto em: ${dataAbertura}</p></div><span class="text-xs text-center font-semibold text-white px-3 py-1 rounded-full ${c.status === 'Chamado Recebido'?'bg-blue-500':c.status === 'Aceito'?'bg-green-500':c.status === 'Técnico a caminho'?'bg-orange-500':c.status === 'Finalizado'?'bg-gray-500':'bg-red-500'}">${statusText}</span></div><div class="mt-4 pt-4 border-t">${infoExtra}</div></div>`;
             }).join('');
         }
         
         function getFirebaseErrorMessage(error) {
-            switch (error.code) {
-                case 'auth/invalid-email': return 'O formato do e-mail é inválido.';
-                case 'auth/user-not-found': return 'Não há conta registrada com este e-mail.';
-                case 'auth/wrong-password': return 'Senha incorreta.';
-                case 'auth/email-already-in-use': return 'Este e-mail já foi cadastrado.';
-                case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.';
-                default: return 'Ocorreu um erro. Por favor, tente novamente.';
-            }
+            switch (error.code) { case 'auth/invalid-email': return 'O formato do e-mail é inválido.'; case 'auth/user-not-found': return 'Não há conta registrada com este e-mail.'; case 'auth/wrong-password': return 'Senha incorreta.'; case 'auth/email-already-in-use': return 'Este e-mail já foi cadastrado.'; case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.'; default: return 'Ocorreu um erro. Por favor, tente novamente.'; }
         }
         
         window.showModal = (title, message) => { document.getElementById('notification-title').textContent = title; document.getElementById('notification-message').textContent = message; document.getElementById('notification-modal').classList.remove('hidden'); }
