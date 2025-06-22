@@ -149,7 +149,23 @@
                     acaoPrincipalButton = `<button onclick="aceitarChamado('${c.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-check"></i> Aceitar</button>`;
                  } else if (c.status === 'Aceito') {
                     const subject = `✅ Chamado Aceito, ${c.nome}! Sua O.S. é a Nº ${c.os}`;
-                    const body = `Olá, ${c.nome}!\n\nSua solicitação de serviço de ${c.categoria} foi aceita.\nSua Ordem de Serviço é: ${c.os}\n\nEm breve entraremos em contato.\n\nEquipe Facilita Assist`;
+                    const body = `
+                        <html>
+                            <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                                <div style="max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                                    <img src="${URL_LOGO_EMPRESA}" alt="Logo da Empresa" style="max-width: 150px; display: block; margin-bottom: 20px;">
+                                    <h2>Olá, ${c.nome}!</h2>
+                                    <p>Ótima notícia! Sua solicitação de serviço de <strong>${c.categoria}</strong> foi aceita por nossa equipe.</p>
+                                    <p>A sua Ordem de Serviço (O.S.) para acompanhamento é:</p>
+                                    <p style="font-size: 24px; font-weight: bold; color: #005A9C; margin: 10px 0; text-align: center; background-color: #f0f0f0; padding: 10px; border-radius: 5px;">${c.os}</p>
+                                    <p>Em breve, um de nossos técnicos entrará em contato para confirmar a melhor data e horário para a visita.</p>
+                                    <p>Agradecemos a sua confiança!</p>
+                                    <br>
+                                    <p style="font-size: 12px; color: #777;">Este é um e-mail automático, por favor, não o responda.</p>
+                                </div>
+                            </body>
+                        </html>
+                    `;
                     const mailtoLink = `mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                     acaoPrincipalButton = `<a href="${mailtoLink}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-envelope"></i> Notificar Cliente (OS: ${c.os})</a>`;
                  } else { acaoPrincipalButton = `<div class="flex-1"></div>`; }
