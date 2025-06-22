@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Chamados - Facilita Assist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-container {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .form-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+        .chamado-card {
+            transition: all 0.3s ease;
+        }
+        .status-recebido { border-left: 5px solid #3b82f6; }
+        .status-aceito { border-left: 5px solid #22c55e; }
+        .status-finalizado { border-left: 5px solid #6b7280; }
+        .status-cancelado { border-left: 5px solid #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Modal de Notificação -->
+    <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <h3 id="notification-title" class="text-lg font-bold text-gray-900"></h3>
+            <p id="notification-message" class="mt-2 text-sm text-gray-600"></p>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Cabeçalho -->
+        <header class="bg-white shadow-md sticky top-0 z-10">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <div class="flex items-center space-x-4">
+                         <img src="https://drive.google.com/uc?export=view&id=1L4yc0VdhoY_esmIZRABRcy9KOe3kwy86" alt="Logo Facilita Assist" class="h-12 w-auto"
+                         onerror="this.onerror=null; this.src='https://placehold.co/150x50/005A9C/FFFFFF?text=Facilita Assist';">
+                        <h1 class="text-2xl font-bold text-gray-900 hidden sm:block">Central de Chamados</h1>
+                    </div>
+                    <div id="auth-info" class="text-xs text-gray-500 text-right">
+                        <p>Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- Coluna do Formulário -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-full">
+                    <h2 class="text-xl font-bold mb-4 border-b pb-3">Abrir Novo Chamado</h2>
+                    <form id="chamado-form" class="space-y-4">
+                        <div>
+                            <label for="nome" class="block text-sm font-medium text-gray-700">Nome:</label>
+                            <input type="text" id="nome" name="nome" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                            <input type="email" id="email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone (WhatsApp):</label>
+                            <input type="tel" id="telefone" name="telefone" required placeholder="Ex: 5541999998888" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="endereco" class="block text-sm font-medium text-gray-700">Endereço Completo:</label>
+                            <input type="text" id="endereco" name="endereco" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="categoria" class="block text-sm font-medium text-gray-700">Categoria de Serviço:</label>
+                            <select id="categoria" name="categoria" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option>Eletricista</option>
+                                <option>Encanador</option>
+                                <option>Montador de Móveis</option>
+                                <option>Pintor</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="detalhes" class="block text-sm font-medium text-gray-700">Detalhe do Defeito:</label>
+                            <textarea id="detalhes" name="detalhes" rows="3" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" id="submit-button" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                Enviar Chamado
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Coluna da Lista de Chamados -->
+                <div class="lg:col-span-2">
+                    <h2 class="text-xl font-bold mb-4">Fila de Chamados</h2>
+                    <div id="chamados-list" class="space-y-4">
+                        <div class="text-center py-10">
+                            <i class="fas fa-spinner fa-spin fa-3x text-gray-400"></i>
+                            <p class="mt-4 text-gray-500">Carregando chamados...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        // Importações do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Configuração ---
+        // Configuração do seu App da Web do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIICQmfAMc-yNdXcyb6o9x5B9Yf3JzPos",
+            authDomain: "facilita-assist-chamados.firebaseapp.com",
+            projectId: "facilita-assist-chamados",
+            storageBucket: "facilita-assist-chamados.appspot.com", // CORREÇÃO APLICADA AQUI
+            messagingSenderId: "123881192310",
+            appId: "1:123881192310:web:ed6dc6f7486ee1ccbbd857",
+            measurementId: "G-V4PMT5HCFK"
+        };
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'central-chamados-default';
+        
+        // --- Configurações do seu negócio (EDITÁVEIS) ---
+        const SOCIOS_WHATSAPP = [{ nome: "Erick Ruan", whatsapp: "5541992065641" }];
+        const URL_LOGO_EMPRESA = "https://drive.google.com/uc?export=view&id=1L4yc0VdhoY_esmIZRABRcy9KOe3kwy86";
+        
+        let db, auth, userId;
+
+        // --- Inicialização e Autenticação ---
+        async function setupFirebase() {
+            try {
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        document.getElementById('auth-info').innerHTML = `<p class="font-semibold">Usuário Conectado</p><p>ID: ${userId.substring(0, 12)}...</p>`;
+                        listenToChamados();
+                    } else {
+                         document.getElementById('auth-info').innerHTML = `<p class="font-semibold text-red-500">Desconectado</p>`;
+                    }
+                });
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Erro na inicialização do Firebase:", error);
+                showModal("Erro de Conexão", "Não foi possível conectar ao serviço de dados. Verifique o console para mais detalhes.");
+            }
+        }
+
+        // --- Lógica de Dados (Firestore) ---
+
+        // Listener para chamados em tempo real
+        function listenToChamados() {
+            if (!db) return;
+            const chamadosCollection = collection(db, 'artifacts', appId, 'public', 'data', 'chamados');
+            const q = query(chamadosCollection);
+
+            onSnapshot(q, (snapshot) => {
+                const chamados = [];
+                snapshot.forEach(doc => {
+                    chamados.push({ id: doc.id, ...doc.data() });
+                });
+                // Ordenar em memória: mais recentes primeiro
+                chamados.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                renderChamados(chamados);
+            }, (error) => {
+                console.error("Erro ao ouvir chamados:", error);
+                showModal("Erro de Leitura", "Não foi possível carregar os chamados em tempo real.");
+            });
+        }
+
+        // Adicionar um novo chamado
+        const form = document.getElementById('chamado-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i>&nbsp; Enviando...`;
+
+            const formData = new FormData(form);
+            const chamadoData = {
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                telefone: formData.get('telefone').replace(/\D/g, ''), // Limpa para ter só números
+                endereco: formData.get('endereco'),
+                categoria: formData.get('categoria'),
+                detalhes: formData.get('detalhes'),
+                status: 'Chamado Recebido',
+                os: null,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                const chamadosCollection = collection(db, 'artifacts', appId, 'public', 'data', 'chamados');
+                await addDoc(chamadosCollection, chamadoData);
+                showModal("Sucesso!", "Seu chamado foi aberto e nossa equipe já foi notificada.");
+                form.reset();
+            } catch (error) {
+                console.error("Erro ao adicionar chamado:", error);
+                showModal("Erro", "Não foi possível enviar seu chamado. Tente novamente.");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Chamado';
+            }
+        });
+        
+        // Aceitar um chamado
+        window.aceitarChamado = async function(docId) {
+             if (!db) return;
+            
+            try {
+                // 1. Gerar novo número de OS
+                const chamadosCollection = collection(db, 'artifacts', appId, 'public', 'data', 'chamados');
+                const querySnapshot = await getDocs(chamadosCollection);
+                let maxOS = 1000;
+                querySnapshot.forEach(doc => {
+                    const os = doc.data().os;
+                    if (os && os > maxOS) {
+                        maxOS = os;
+                    }
+                });
+                const newOS = maxOS + 1;
+
+                // 2. Atualizar o documento no Firestore
+                const chamadoRef = doc(db, 'artifacts', appId, 'public', 'data', 'chamados', docId);
+                await updateDoc(chamadoRef, {
+                    status: 'Aceito',
+                    os: newOS
+                });
+
+                showModal("Chamado Aceito!", `A Ordem de Serviço Nº ${newOS} foi gerada com sucesso.`);
+                // O card será atualizado automaticamente pelo onSnapshot
+            } catch (error) {
+                console.error("Erro ao aceitar chamado:", error);
+                showModal("Erro", "Ocorreu um problema ao tentar aceitar o chamado.");
+            }
+        }
+        
+        // Atualizar status
+        window.atualizarStatus = async function(docId, newStatus) {
+            if (!db) return;
+            const chamadoRef = doc(db, 'artifacts', appId, 'public', 'data', 'chamados', docId);
+            try {
+                 await updateDoc(chamadoRef, { status: newStatus });
+                 showModal("Status Atualizado", `O chamado foi atualizado para "${newStatus}".`);
+            } catch(error) {
+                console.error("Erro ao atualizar status:", error);
+                showModal("Erro", "Não foi possível atualizar o status.");
+            }
+        }
+
+
+        // --- Renderização da UI ---
+        function renderChamados(chamados) {
+            const list = document.getElementById('chamados-list');
+            if (chamados.length === 0) {
+                list.innerHTML = `<div class="text-center py-10 bg-white rounded-lg shadow"><i class="fas fa-check-circle fa-3x text-green-400"></i><p class="mt-4 text-gray-600">Nenhum chamado na fila. Tudo em ordem!</p></div>`;
+                return;
+            }
+
+            list.innerHTML = chamados.map(chamado => {
+                const data = chamado.timestamp ? chamado.timestamp.toDate().toLocaleString('pt-BR') : 'Data indisponível';
+                const statusClass = `status-${chamado.status.toLowerCase().replace(' ', '-')}`;
+                
+                // Botão de Aceitar / Gerar Email de OS
+                let acaoPrincipalButton;
+                if (chamado.status === 'Chamado Recebido') {
+                    acaoPrincipalButton = `<button onclick="aceitarChamado('${chamado.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-check"></i> Aceitar</button>`;
+                } else if (chamado.status === 'Aceito') {
+                    const subject = `✅ Chamado Aceito, ${chamado.nome}! Sua O.S. é a Nº ${chamado.os}`;
+                    const body = `<html><body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;"><div style="max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px;"><img src="${URL_LOGO_EMPRESA}" alt="Logo da Empresa" style="max-width: 150px; display: block; margin-bottom: 20px;"><h2>Olá, ${chamado.nome}!</h2><p>Ótima notícia! Sua solicitação de serviço de <strong>${chamado.categoria}</strong> foi aceita por nossa equipe.</p><p>A sua Ordem de Serviço (O.S.) para acompanhamento é:</p><p style="font-size: 24px; font-weight: bold; color: #005A9C; margin: 10px 0; text-align: center; background-color: #f0f0f0; padding: 10px; border-radius: 5px;">${chamado.os}</p><p>Em breve, um de nossos técnicos entrará em contato para confirmar a melhor data e horário para a visita.</p><p>Agradecemos a sua confiança!</p><br><p style="font-size: 12px; color: #777;">Este é um e-mail automático, por favor, não o responda.</p></div></body></html>`;
+                    const mailtoLink = `mailto:${chamado.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    acaoPrincipalButton = `<a href="${mailtoLink}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-envelope"></i> Notificar Cliente (OS: ${chamado.os})</a>`;
+                } else {
+                     acaoPrincipalButton = `<div class="flex-1"></div>`;
+                }
+
+                // Links do WhatsApp
+                let whatsappLinksHtml = SOCIOS_WHATSAPP.map(socio => {
+                    const baseMessage = `Novo Chamado!\n-------------------------\nCliente: ${chamado.nome}\nTelefone: ${chamado.telefone}\nEndereço: ${chamado.endereco}\nCategoria: ${chamado.categoria}\nDetalhes: ${chamado.detalhes}`;
+                    const whatsappLink = `https://wa.me/${socio.whatsapp}?text=${encodeURIComponent(baseMessage)}`;
+                    return `<a href="${whatsappLink}" target="_blank" class="flex-1 bg-green-100 text-green-800 hover:bg-green-200 font-semibold py-2 px-3 rounded-lg transition-colors text-xs flex items-center justify-center gap-1.5"><i class="fab fa-whatsapp"></i> ${socio.nome}</a>`;
+                }).join('');
+
+                return `
+                    <div class="bg-white rounded-lg shadow-md p-5 chamado-card ${statusClass}">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-3 mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-900">${chamado.nome}</h3>
+                                <p class="text-sm text-gray-500">${chamado.categoria}</p>
+                            </div>
+                            <div class="mt-2 sm:mt-0 flex items-center justify-end space-x-3">
+                               <span class="text-xs font-semibold text-white px-3 py-1 rounded-full ${chamado.status === 'Chamado Recebido' ? 'bg-blue-500' : chamado.status === 'Aceito' ? 'bg-green-500' : chamado.status === 'Finalizado' ? 'bg-gray-500' : 'bg-red-500'}">${chamado.status}</span>
+                               <span class="text-xs text-gray-400">${data}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                            <div><strong class="block text-gray-600">Email:</strong> <span>${chamado.email}</span></div>
+                            <div><strong class="block text-gray-600">Telefone:</strong> <span>${chamado.telefone}</span></div>
+                            <div class="md:col-span-2"><strong class="block text-gray-600">Endereço:</strong> <span>${chamado.endereco}</span></div>
+                            <div class="md:col-span-2"><strong class="block text-gray-600">Detalhes:</strong> <p class="mt-1 p-2 bg-gray-50 rounded-md">${chamado.detalhes}</p></div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center gap-3 pt-3 border-t">
+                             ${acaoPrincipalButton}
+                            <div class="flex-1 flex justify-end gap-2">${whatsappLinksHtml}</div>
+                        </div>
+                        
+                         <div class="mt-3">
+                            <label for="status-update-${chamado.id}" class="sr-only">Atualizar Status</label>
+                            <select id="status-update-${chamado.id}" onchange="atualizarStatus('${chamado.id}', this.value)" class="w-full sm:w-auto bg-gray-200 border-gray-300 rounded-md shadow-sm text-sm">
+                                <option value="" disabled ${!chamado.status ? 'selected' : ''}>Mudar status...</option>
+                                <option value="Chamado Recebido" ${chamado.status === 'Chamado Recebido' ? 'selected' : ''}>Recebido</option>
+                                <option value="Aceito" ${chamado.status === 'Aceito' ? 'selected' : ''}>Aceito</option>
+                                <option value="Finalizado" ${chamado.status === 'Finalizado' ? 'selected' : ''}>Finalizado</option>
+                                <option value="Cancelado" ${chamado.status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- Funções do Modal ---
+        window.showModal = function(title, message) {
+            document.getElementById('notification-title').textContent = title;
+            document.getElementById('notification-message').textContent = message;
+            document.getElementById('notification-modal').classList.remove('hidden');
+        }
+        window.closeModal = function() {
+            document.getElementById('notification-modal').classList.add('hidden');
+        }
+
+        // --- Iniciar a aplicação ---
+        window.onload = setupFirebase;
+    </script>
+</body>
+</html>
+```
