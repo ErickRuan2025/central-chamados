@@ -146,9 +146,27 @@
                  if (c.status === 'Chamado Recebido') {
                     acaoPrincipalButton = `<button onclick="aceitarChamado('${c.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-check"></i> Aceitar</button>`;
                  } else if (c.status === 'Aceito' || c.status === 'Técnico a caminho') {
-                    const subject = `✅ Chamado Aceito, ${c.nome}! Sua O.S. é a Nº ${c.os}`;
-                    // CORREÇÃO: Corpo do e-mail em texto puro para máxima compatibilidade
-                    const body = `Olá, ${c.nome}!\n\nÓtima notícia! Sua solicitação de serviço de ${c.categoria} foi aceita por nossa equipe.\n\nA sua Ordem de Serviço (O.S.) para acompanhamento é: ${c.os}\n\nEm breve, um de nossos técnicos entrará em contato para confirmar a melhor data e horário para a visita.\n\nAgradecemos a sua confiança!\n\n--\nFacilita Assist\nEste é um e-mail automático, por favor, não o responda.`;
+                    const subject = `✅ Chamado Aceito (OS: ${c.os}) - Facilita Assist`;
+                    // ** CORREÇÃO FINAL APLICADA AQUI **
+                    // Texto puro, bem formatado com quebras de linha (\n) para máxima compatibilidade.
+                    const body = [
+                        `Olá, ${c.nome}!`,
+                        ``,
+                        `Ótima notícia! Sua solicitação de serviço de "${c.categoria}" foi aceita por nossa equipe.`,
+                        ``,
+                        `A sua Ordem de Serviço (O.S.) para acompanhamento é:`,
+                        `${c.os}`,
+                        ``,
+                        `Em breve, um de nossos técnicos entrará em contato para confirmar a melhor data e horário para a visita.`,
+                        ``,
+                        `Agradecemos a sua confiança!`,
+                        ``,
+                        `Atenciosamente,`,
+                        `Equipe Facilita Assist`,
+                        ``,
+                        `(Este é um e-mail automático, por favor, não o responda)`
+                    ].join("\n");
+
                     const mailtoLink = `mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                     acaoPrincipalButton = `<a href="${mailtoLink}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-envelope"></i> Notificar Cliente (OS: ${c.os})</a>`;
                  } else { acoPrincipalButton = `<div class="flex-1"></div>`; }
