@@ -56,7 +56,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, doc, updateDoc, getDocs, getDoc, serverTimestamp, collectionGroup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, doc, updateDoc, getDocs, getDoc, setDoc, serverTimestamp, collectionGroup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBIICQmfAMc-yNdXcyb6o9x5B9Yf3JzPos",
@@ -67,10 +67,8 @@
             appId: "1:123881192310:web:ed6dc6f7486ee1ccbbd857",
             measurementId: "G-V4PMT5HCFK"
         };
-        const appId = 'central-chamados-default';
         const URL_LOGO_EMPRESA = "https://drive.google.com/uc?export=view&id=1L4yc0VdhoY_esmIZRABRcy9KOe3kwy86";
         const SOCIOS_WHATSAPP = [{ nome: "Erick Ruan", whatsapp: "5541992065641" }];
-
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -84,8 +82,7 @@
         // Monitora o estado de autenticação
         onAuthStateChanged(auth, async user => {
             if (user) {
-                // VERIFICA SE O USUÁRIO É ADMIN
-                const adminRef = doc(db, 'artifacts', appId, 'public', 'data', 'admins', user.uid);
+                const adminRef = doc(db, 'artifacts', 'central-chamados-default', 'public', 'data', 'admins', user.uid);
                 const adminSnap = await getDoc(adminRef);
 
                 if (adminSnap.exists()) {
@@ -121,7 +118,7 @@
 
         // Ouvir todos os chamados
         function listenToAllChamados() {
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'chamados'));
+            const q = query(collection(db, 'artifacts', 'central-chamados-default', 'public', 'data', 'chamados'));
             onSnapshot(q, snapshot => {
                 const chamados = [];
                 snapshot.forEach(doc => chamados.push({ id: doc.id, ...doc.data() }));
@@ -133,7 +130,7 @@
         // Aceitar chamado
         window.aceitarChamado = async function(docId) {
             try {
-                const chamadosRef = collection(db, 'artifacts', appId, 'public', 'data', 'chamados');
+                const chamadosRef = collection(db, 'artifacts', 'central-chamados-default', 'public', 'data', 'chamados');
                 const q = query(chamadosRef);
                 const querySnapshot = await getDocs(q);
                 let maxOS = 1000;
@@ -142,7 +139,7 @@
                     if (os && os > maxOS) maxOS = os;
                 });
                 const newOS = maxOS + 1;
-                const chamadoRef = doc(db, 'artifacts', appId, 'public', 'data', 'chamados', docId);
+                const chamadoRef = doc(db, 'artifacts', 'central-chamados-default', 'public', 'data', 'chamados', docId);
                 await updateDoc(chamadoRef, { status: 'Aceito', os: newOS });
                 showModal("Sucesso!", `Chamado aceito! A O.S. Nº ${newOS} foi gerada.`);
             } catch (error) {
@@ -152,7 +149,7 @@
         
         // Atualizar status
         window.atualizarStatus = async function(docId, newStatus) {
-            const chamadoRef = doc(db, 'artifacts', appId, 'public', 'data', 'chamados', docId);
+            const chamadoRef = doc(db, 'artifacts', 'central-chamados-default', 'public', 'data', 'chamados', docId);
             await updateDoc(chamadoRef, { status: newStatus });
             showModal("Status Atualizado", `O chamado agora está como "${newStatus}".`);
         }
@@ -227,10 +224,17 @@
             document.getElementById('notification-modal').classList.add('hidden');
         }
 
-        // Função para criar o primeiro admin (executar uma vez no console do navegador)
-        window.criarPrimeiroAdmin = function() {
-            console.log("Para criar o primeiro admin, faça login com a conta que deseja tornar administradora e depois execute no console: `const adminRef = doc(db, 'artifacts', appId, 'public', 'data', 'admins', auth.currentUser.uid); await setDoc(adminRef, { admin: true });`");
-        }
+        // --- EXPOSIÇÃO PARA DEBUG VIA CONSOLE ---
+        // Esta parte expõe as ferramentas do Firebase para o console, facilitando a criação do admin.
+        window.auth = auth;
+        window.db = db;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        const appId = 'central-chamados-default'; // Adicionado aqui para garantir acesso
+        window.appId = appId;
+
+
+        console.log("Ferramentas de admin (auth, db) prontas para uso no console.");
 
     </script>
 </body>
