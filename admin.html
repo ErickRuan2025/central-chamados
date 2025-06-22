@@ -143,37 +143,49 @@
             }
         };
 
+        // ** FUNÇÃO CORRIGIDA PARA GERAR O BOTÃO DE AÇÃO PRINCIPAL **
+        function getAcaoPrincipalButton(c) {
+            if (c.status === 'Chamado Recebido') {
+                return `<button onclick="aceitarChamado('${c.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-check"></i> Aceitar</button>`;
+            } 
+            
+            if (c.status === 'Aceito' || c.status === 'Técnico a caminho') {
+                const subject = `✅ Chamado Aceito (OS: ${c.os}) - Facilita Assist`;
+                const body = [
+                    `Olá, ${c.nome}!`,
+                    ``,
+                    `Ótima notícia! Sua solicitação de serviço de "${c.categoria}" foi aceita por nossa equipe.`,
+                    ``,
+                    `A sua Ordem de Serviço (O.S.) para acompanhamento é:`,
+                    `${c.os}`,
+                    ``,
+                    `Em breve, um de nossos técnicos entrará em contato para confirmar a melhor data e horário para a visita.`,
+                    ``,
+                    `Agradecemos a sua confiança!`,
+                    ``,
+                    `Atenciosamente,`,
+                    `Equipe Facilita Assist`,
+                    ``,
+                    `(Este é um e-mail automático, por favor, não o responda)`
+                ].join("\n");
+                const mailtoLink = `mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                return `<a href="${mailtoLink}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-envelope"></i> Notificar Cliente (OS: ${c.os})</a>`;
+            }
+            
+            // Para todos os outros status (Finalizado, Cancelado, etc.), retorna um espaço vazio.
+            return `<div class="flex-1"></div>`;
+        }
+
         function renderChamados(chamados) {
             const list = document.getElementById('chamados-list');
             if (chamados.length === 0) { list.innerHTML = `<div class="text-center py-10 bg-white rounded-lg shadow"><i class="fas fa-check-circle fa-3x text-green-400"></i><p class="mt-4 text-gray-600">Nenhum chamado na fila.</p></div>`; return; }
             list.innerHTML = chamados.map(c => {
                  const data = c.timestamp ? c.timestamp.toDate().toLocaleString('pt-BR') : 'N/A';
                  const statusClass = `status-${c.status.toLowerCase().replace(/\s+/g, '-')}`;
-                 let acaoPrincipalButton;
-                 if (c.status === 'Chamado Recebido') {
-                    acaoPrincipalButton = `<button onclick="aceitarChamado('${c.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-check"></i> Aceitar</button>`;
-                 } else if (c.status === 'Aceito' || c.status === 'Técnico a caminho') {
-                    const subject = `✅ Chamado Aceito (OS: ${c.os}) - Facilita Assist`;
-                    const body = [
-                        `Olá, ${c.nome}!`,
-                        ``,
-                        `Ótima notícia! Sua solicitação de serviço de "${c.categoria}" foi aceita por nossa equipe.`,
-                        ``,
-                        `A sua Ordem de Serviço (O.S.) para acompanhamento é:`,
-                        `${c.os}`,
-                        ``,
-                        `Em breve, um de nossos técnicos entrará em contato para confirmar a melhor data e horário para a visita.`,
-                        ``,
-                        `Agradecemos a sua confiança!`,
-                        ``,
-                        `Atenciosamente,`,
-                        `Equipe Facilita Assist`,
-                        ``,
-                        `(Este é um e-mail automático, por favor, não o responda)`
-                    ].join("\n");
-                    const mailtoLink = `mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                    acaoPrincipalButton = `<a href="${mailtoLink}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-envelope"></i> Notificar Cliente (OS: ${c.os})</a>`;
-                 } else { acoPrincipalButton = `<div class="flex-1"></div>`; }
+                 
+                 // ** CÓDIGO MAIS LIMPO CHAMANDO A NOVA FUNÇÃO **
+                 const acaoPrincipalButton = getAcaoPrincipalButton(c);
+                 
                  const whatsappLinksHtml = SOCIOS_WHATSAPP.map(socio => `<a href="https://wa.me/${socio.whatsapp}?text=${encodeURIComponent(`Chamado Recebido!\nCliente: ${c.nome}\nTelefone: ${c.telefone}\nEndereço: ${c.endereco}\nCategoria: ${c.categoria}\nDetalhes: ${c.detalhes}`)}" target="_blank" class="flex-1 bg-green-100 text-green-800 hover:bg-green-200 font-semibold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5"><i class="fab fa-whatsapp"></i> ${socio.nome}</a>`).join('');
                  const locationButton = `<button id="location-btn-${c.id}" onclick="enviarLocalizacao('${c.id}')" class="ml-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-1 px-2 rounded-md text-xs ${c.status !== 'Técnico a caminho' ? 'hidden' : ''}"><i class="fas fa-map-marker-alt"></i> Enviar Localização</button>`;
                  return `<div class="bg-white rounded-lg shadow-md p-5 ${statusClass}"><div class="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-3 mb-3"><div><h3 class="font-bold text-lg">${c.nome}</h3><p class="text-sm text-gray-500">${c.categoria}</p></div><div class="mt-2 sm:mt-0 flex items-center justify-end space-x-3"><span class="text-xs font-semibold text-white px-3 py-1 rounded-full ${c.status==='Chamado Recebido'?'bg-blue-500':c.status==='Aceito'?'bg-green-500': c.status === 'Técnico a caminho' ? 'bg-orange-500' : c.status==='Finalizado'?'bg-gray-500':'bg-red-500'}">${c.os ? `OS: ${c.os} - ` : ''}${c.status}</span><span class="text-xs text-gray-400">${data}</span></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4"><div><strong class="block">Email:</strong> <span>${c.email}</span></div><div><strong class="block">Telefone:</strong> <span>${c.telefone}</span></div><div class="md:col-span-2"><strong class="block">Endereço:</strong> <span>${c.endereco}</span></div><div class="md:col-span-2"><strong class="block">Detalhes:</strong> <p class="mt-1 p-2 bg-gray-50 rounded-md">${c.detalhes}</p></div></div><div class="flex flex-col sm:flex-row items-center gap-3 pt-3 border-t">${acaoPrincipalButton}<div class="flex-1 flex justify-end gap-2">${whatsappLinksHtml}</div></div><div class="mt-3 flex items-center"><select onchange="atualizarStatus('${c.id}', this.value)" class="w-full sm:w-auto bg-gray-200 border-gray-300 rounded-md shadow-sm text-sm"><option value="" disabled ${!c.status?'selected':''}>Mudar status...</option><option value="Chamado Recebido" ${c.status==='Chamado Recebido'?'selected':''}>Recebido</option><option value="Aceito" ${c.status==='Aceito'?'selected':''}>Aceito</option><option value="Técnico a caminho" ${c.status==='Técnico a caminho'?'selected':''}>Técnico a caminho</option><option value="Finalizado" ${c.status==='Finalizado'?'selected':''}>Finalizado</option><option value="Cancelado" ${c.status==='Cancelado'?'selected':''}>Cancelado</option></select>${locationButton}</div></div>`;
