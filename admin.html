@@ -52,7 +52,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        const ui = { authSection: document.getElementById('auth-section'), makeAdminSection: document.getElementById('make-admin-section'), appContent: document.getElementById('app-content'), userInfo: document.getElementById('user-info'), loginForm: document.getElementById('login-form'), logoutButton: document.getElementById('logout-button'), makeAdminButton: document.getElementById('make-admin-button'), forgotPasswordButton: document.getElementById('forgot-password-button-admin') };
+        const ui = { authSection: document.getElementById('auth-section'), makeAdminSection: document.getElementById('make-admin-section'), appContent: document.getElementById('app-content'), userInfo: document.getElementById('user-info'), loginForm: document.getElementById('login-form'), logoutButton: document.getElementById('logout-button'), makeAdminButton: document.getElementById('make-admin-button'), forgotPasswordButton: document.getElementById('forgot-password-button-admin'), chamadosList: document.getElementById('chamados-list') };
 
         onAuthStateChanged(auth, async user => {
             if (user) {
@@ -99,10 +99,17 @@
 
         function listenToAllChamados() {
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'chamados'));
-            onSnapshot(q, snapshot => {
-                const chamados = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderChamados(chamados.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0)));
-            });
+            onSnapshot(q, 
+                (snapshot) => {
+                    const chamados = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderChamados(chamados.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0)));
+                },
+                (error) => {
+                    console.error("Erro no Firestore Snapshot: ", error);
+                    ui.chamadosList.innerHTML = `<div class="text-center py-10 bg-white rounded-lg shadow"><i class="fas fa-exclamation-triangle fa-3x text-red-400"></i><p class="mt-4 text-gray-600 font-semibold">Erro ao carregar os chamados.</p><p class="text-sm text-gray-500 mt-2">Você não tem permissão para ver esta lista. Verifique as regras de segurança do Firestore.</p></div>`;
+                    showModal("Erro de Permissão", `Não foi possível carregar a lista de chamados. Código do erro: ${error.code}`);
+                }
+            );
         }
         
         window.aceitarChamado = async (docId) => {
@@ -147,8 +154,6 @@
                     acaoPrincipalButton = `<button onclick="aceitarChamado('${c.id}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-check"></i> Aceitar</button>`;
                  } else if (c.status === 'Aceito' || c.status === 'Técnico a caminho') {
                     const subject = `✅ Chamado Aceito (OS: ${c.os}) - Facilita Assist`;
-                    // ** CORREÇÃO FINAL APLICADA AQUI **
-                    // Texto puro, bem formatado com quebras de linha (\n) para máxima compatibilidade.
                     const body = [
                         `Olá, ${c.nome}!`,
                         ``,
@@ -166,7 +171,6 @@
                         ``,
                         `(Este é um e-mail automático, por favor, não o responda)`
                     ].join("\n");
-
                     const mailtoLink = `mailto:${c.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                     acaoPrincipalButton = `<a href="${mailtoLink}" target="_blank" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-envelope"></i> Notificar Cliente (OS: ${c.os})</a>`;
                  } else { acoPrincipalButton = `<div class="flex-1"></div>`; }
